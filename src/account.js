@@ -26,18 +26,40 @@ export default class WalletAccountEvm {
     this.#account = account
   }
 
+  /**
+   * The derivation path's index of this account
+   * @returns {number}
+   */
   get index () {
     return this.#account.index
   }
 
+  /**
+   * The derivation path of this account (see BIP-44)
+   * @returns {number}
+   */
   get path () {
     return this.#account.path
   }
 
+  /**
+   * The account’s address
+   * @returns {string}
+   */
   get address () {
     return this.#account.address
   }
 
+  /**
+   * @typedef {Object} KeyPair
+   * @property {string} publicKey - The public key
+   * @property {string} privateKey - The private key
+   */
+
+  /**
+   * The account’s key pair
+   * @returns {KeyPair}
+   */
   get keyPair () {
     return {
       privateKey: this.#account.privateKey,
@@ -48,7 +70,7 @@ export default class WalletAccountEvm {
   /**
    * Signs a message.
    * @param {string} message - The message to sign.
-   * @returns Promise with the signature string.
+   * @returns {Promise<string>} Promise with the signature string.
    */
   async sign (message) {
     return await this.#account.signMessage(message)
@@ -58,7 +80,7 @@ export default class WalletAccountEvm {
    * Verifies a message signature.
    * @param {string} message - The original message.
    * @param {string} signature - The signature to verify.
-   * @returns Promise that resolves to true if valid, otherwise false.
+   * @returns {Promise<boolean>} Promise that resolves to true if valid, otherwise false.
    */
   async verify (message, signature) {
     const address = await verifyMessage(message, signature)

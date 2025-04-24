@@ -13,19 +13,12 @@
 // limitations under the License.
 'use strict'
 
-/**
- * @fileoverview Wallet service for EVM chains using HDNode
- */
-
 import { HDNodeWallet, Mnemonic, JsonRpcProvider } from 'ethers'
 
 import WalletAccountEvm from './account.js'
 
 const BIP_44_ETH_DERIVATION_PATH_BASE = 'm/44\'/60\'/0\'/0'
 
-/**
- * Service class for managing Ethereum wallets
- */
 export default class WalletManagerEvm {
   #wallet
   #provider
@@ -70,7 +63,7 @@ export default class WalletManagerEvm {
 
     if (rpcUrl) {
       this.#provider = new JsonRpcProvider(rpcUrl)
-      
+
       this.#wallet = this.#wallet.connect(this.#provider)
     }
   }
