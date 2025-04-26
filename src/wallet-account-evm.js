@@ -18,33 +18,32 @@ import { verifyMessage } from 'ethers'
 export default class WalletAccountEvm {
   #account
 
-  /**
-   * Creates an instance of WalletAccountEvm
-   * @param {number} index - The wallet’s BIP-39 seed phrase.
-   */
   constructor (account) {
     this.#account = account
   }
 
   /**
-   * The derivation path's index of this account
-   * @returns {number}
+   * The derivation path's index of this account.
+   * 
+   * @type {number}
    */
   get index () {
     return this.#account.index
   }
 
   /**
-   * The derivation path of this account (see BIP-44)
-   * @returns {number}
+   * The derivation path of this account (see [BIP-44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)).
+   * 
+   * @type {number}
    */
   get path () {
     return this.#account.path
   }
 
   /**
-   * The account’s address
-   * @returns {string}
+   * The account's address.
+   * 
+   * @type {string}
    */
   get address () {
     return this.#account.address
@@ -52,13 +51,14 @@ export default class WalletAccountEvm {
 
   /**
    * @typedef {Object} KeyPair
-   * @property {string} publicKey - The public key
-   * @property {string} privateKey - The private key
+   * @property {string} publicKey - The public key.
+   * @property {string} privateKey - The private key.
    */
 
   /**
-   * The account’s key pair
-   * @returns {KeyPair}
+   * The account's key pair.
+   * 
+   * @type {KeyPair}
    */
   get keyPair () {
     return {
@@ -69,36 +69,47 @@ export default class WalletAccountEvm {
 
   /**
    * Signs a message.
+   * 
    * @param {string} message - The message to sign.
-   * @returns {Promise<string>} Promise with the signature string.
+   * @returns {Promise<string>} The message's signature.
    */
   async sign (message) {
     return await this.#account.signMessage(message)
   }
 
   /**
-   * Verifies a message signature.
+   * Verifies a message's signature.
+   * 
    * @param {string} message - The original message.
    * @param {string} signature - The signature to verify.
-   * @returns {Promise<boolean>} Promise that resolves to true if valid, otherwise false.
+   * @returns {Promise<boolean>} True if the signature is valid.
    */
   async verify (message, signature) {
     const address = await verifyMessage(message, signature)
-    return address.toLowerCase() === this.#account.address.toLowerCase()
+
+    return address.toLowerCase() == this.#account.address.toLowerCase()
   }
 
   /**
-   * Sends a transaction using the connected wallet.
-   * Requires wallet to be connected to a provider.
-   * @param tx - The transaction object.
-   * @returns {Promise<string>} Promise with the transaction hash.
+   * @typedef {Object} Transaction
+   * @property {string} to - The transaction's recipient.
+   * @property {number} value - The amount of native tokens to send to the recipient.
+   * @property {string} [data] - The transaction's data in hex format.
+   */
+  
+  /**
+   * Sends a transaction with arbitrary data.
+   * 
+   * @param {Transaction} tx - The transaction to send.
+   * @returns {Promise<string>} The transaction's hash.
    */
   async sendTransaction (tx) {
     if (!this.#account.provider) {
-      throw new Error('Wallet is not connected to a provider')
+      throw new Error('The wallet must be connected to a provider to send transactions.')
     }
 
-    const sentTx = await this.#account.sendTransaction(tx)
-    return sentTx.hash
+    const { hash } = await this.#account.sendTransaction(tx)
+
+    return hash
   }
 }

@@ -4,7 +4,6 @@
   "description": "Wallet management utilities for EVM chains",
   "main": "index.js",
   "type": "module",
-  "types": "index.d.ts",
   "scripts": {
     "lint": "standard",
     "lint:fix": "standard --fix"

@@ -21,60 +21,68 @@ const BIP_44_ETH_DERIVATION_PATH_BASE = 'm/44\'/60\'/0\'/0'
 
 export default class WalletManagerEvm {
   #wallet
-  #provider
 
   /**
-   * Creates an instance of WalletManagerEvm
-   * @param {string} seedPhrase - The wallet’s BIP-39 seed phrase.
-   * @param {Object} [config] - The configuration object
-   * @param {string} [config.rpcUrl] - The url of the rpc provider
+   * Creates a new wallet manager for evm blockchains.
+   * 
+   * @param {string} seedPhrase - The wallet's [BIP-39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) seed phrase.
+   * @param {Object} [config] - The configuration object.
+   * @param {string} [config.rpcUrl] - The url of the rpc provider.
    */
   constructor (seedPhrase, config = {}) {
     const { rpcUrl } = config
 
     if (!WalletManagerEvm.isValidSeedPhrase(seedPhrase)) {
-      throw new Error('Seed phrase is invalid!')
+      throw new Error('Seed phrase is invalid.')
     }
 
     this.#wallet = HDNodeWallet.fromPhrase(seedPhrase, undefined, BIP_44_ETH_DERIVATION_PATH_BASE)
 
     if (rpcUrl) {
-      this.#provider = new JsonRpcProvider(rpcUrl)
+      const provider = new JsonRpcProvider(rpcUrl)
 
-      this.#wallet = this.#wallet.connect(this.#provider)
+      this.#wallet = this.#wallet.connect(provider)
     }
   }
 
   /**
-   * Generates a random BIP-39 seed phrase
-   * @returns {string} Returns a random BIP-39 seed phrase
+   * Returns a random [BIP-39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) seed phrase.
+   * 
+   * @returns {string} The seed phrase.
   */
    static getRandomSeedPhrase () {
     const wallet = HDNodeWallet.createRandom()
+    
     return wallet.mnemonic.phrase
   }
 
   /**
-   * Checks if a BIP-39 seed phrase is valid
-   * @param {string} seedPhrase - The wallet’s BIP-39 seed phrase.
-   * @returns {boolean} Returns `true` if the seed phrase is valid
+   * Checks if a seed phrase is valid.
+   * 
+   * @param {string} seedPhrase - The seed phrase.
+   * @returns {boolean} True if the seed phrase is valid.
   */
   static isValidSeedPhrase (seedPhrase) {
     return Mnemonic.isValidMnemonic(seedPhrase)
   }
 
   /**
-  * Get the seed phrase.
-  * @returns {string}
+  * The seed phrase of the wallet.
+  * 
+  * @type {string}
   */
   get seedPhrase () {
     return this.#wallet.mnemonic.phrase
   }
 
   /**
-   * Returns the wallet account at a specific index
-   * @param {number} [index] - The index of the account to get
-   * @returns {WalletAccountEvm} The account
+   * Returns the wallet account at a specific index (see [BIP-44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)).
+   * 
+   * @example
+   * // Returns the account with derivation path m/44'/60'/0'/0/1
+   * const account = wallet.getAccount(1);
+   * @param {number} [index] - The index of the account to get (default: 0).
+   * @returns {WalletAccountEvm} The account.
   */
   getAccount (index = 0) {
     const account = this.#wallet.derivePath(index.toString())
