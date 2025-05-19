@@ -1,7 +1,3 @@
-/**
- * @typedef {Object} EvmWalletConfig
- * @property {string} [rpcUrl] - The url of the rpc provider.
- */
 export default class WalletManagerEvm {
     /**
      * Returns a random [BIP-39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) seed phrase.
@@ -35,7 +31,7 @@ export default class WalletManagerEvm {
      * @example
      * // Returns the account with derivation path m/44'/60'/0'/0/1
      * const account = await wallet.getAccount(1);
-     * @param {number} index - The index of the account to get (default: 0).
+     * @param {number} [index] - The index of the account to get (default: 0).
      * @returns {Promise<WalletAccountEvm>} The account.
      */
     getAccount(index?: number): Promise<WalletAccountEvm>;
@@ -57,10 +53,5 @@ export default class WalletManagerEvm {
     }>;
     #private;
 }
-export type EvmWalletConfig = {
-    /**
-     * - The url of the rpc provider.
-     */
-    rpcUrl?: string;
-};
+export type EvmWalletConfig = import("./wallet-account-evm.js").EvmWalletConfig;
 import WalletAccountEvm from './wallet-account-evm.js';

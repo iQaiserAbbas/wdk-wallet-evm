@@ -16,6 +16,8 @@
 
 import { HDNodeWallet, JsonRpcProvider, Contract, verifyMessage } from 'ethers'
 
+export const BIP_44_ETH_DERIVATION_PATH_BASE = "m/44'/60'"
+
 /**
  * @typedef {Object} KeyPair
  * @property {string} publicKey - The public key.
@@ -45,7 +47,7 @@ export default class WalletAccountEvm {
    * Creates a new evm wallet account.
    *
    * @param {string} seedPhrase - The bip-39 mnemonic.
-   * @param {string} path - The bip-44 derivation path.
+   * @param {string} path - The BIP-44 derivation path suffix (e.g. "0'/0/0").
    * @param {EvmWalletConfig} [config] - The configuration object.
    */
   constructor (seedPhrase, path, config = {}) {
@@ -53,31 +55,13 @@ export default class WalletAccountEvm {
       throw new Error('Seed phrase is invalid.')
     }
 
-    if (typeof path !== 'string' || !path.startsWith('m/')) {
-      throw new Error('Invalid derivation path format.')
-    }
+    const fullPath = `${BIP_44_ETH_DERIVATION_PATH_BASE}/${path}`
+    this.#account = HDNodeWallet.fromPhrase(seedPhrase).derivePath(fullPath)
 
     const { rpcUrl } = config
-
-    const node = HDNodeWallet.fromPhrase(seedPhrase).derivePath(`${BIP_44_ETH_DERIVATION_PATH_BASE}/${path}`)
-
-    let wallet = node
-    let provider = null
-
     if (rpcUrl) {
-      provider = new JsonRpcProvider(rpcUrl)
-      wallet = wallet.connect(provider)
-    }
-
-    this.#account = {
-      privateKey: wallet.privateKey,
-      publicKey: wallet.publicKey,
-      address: wallet.address,
-      signMessage: wallet.signMessage.bind(wallet),
-      sendTransaction: wallet.sendTransaction.bind(wallet),
-      provider,
-      path,
-      index: parseInt(path.split('/').pop(), 10) || 0
+      const provider = new JsonRpcProvider(rpcUrl)    
+      this.#account= this.#account.connect(provider)
     }
   }
 

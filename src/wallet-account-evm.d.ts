@@ -1,3 +1,4 @@
+export const BIP_44_ETH_DERIVATION_PATH_BASE: "m/44'/60'";
 /**
  * @typedef {Object} KeyPair
  * @property {string} publicKey - The public key.
@@ -22,7 +23,7 @@ export default class WalletAccountEvm {
      * Creates a new evm wallet account.
      *
      * @param {string} seedPhrase - The bip-39 mnemonic.
-     * @param {string} path - The bip-44 derivation path.
+     * @param {string} path - The BIP-44 derivation path suffix (e.g. "0'/0/0").
      * @param {EvmWalletConfig} [config] - The configuration object.
      */
     constructor(seedPhrase: string, path: string, config?: EvmWalletConfig);

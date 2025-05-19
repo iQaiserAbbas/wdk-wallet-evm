@@ -17,15 +17,11 @@
 import { HDNodeWallet, Mnemonic, JsonRpcProvider } from 'ethers'
 import WalletAccountEvm from './wallet-account-evm.js'
 
-const BIP_44_ETH_DERIVATION_PATH_BASE = "m/44'/60'"
-
 const FEE_RATE_NORMAL_MULTIPLIER = 1.1,
       FEE_RATE_FAST_MULTIPLIER = 2.0
 
-/**
- * @typedef {Object} EvmWalletConfig
- * @property {string} [rpcUrl] - The url of the rpc provider.
- */
+/** @typedef {import('./wallet-account-evm.js').EvmWalletConfig} EvmWalletConfig */
+
 
 export default class WalletManagerEvm {
   #seedPhrase
@@ -86,7 +82,7 @@ export default class WalletManagerEvm {
    * @example
    * // Returns the account with derivation path m/44'/60'/0'/0/1
    * const account = await wallet.getAccount(1);
-   * @param {number} index - The index of the account to get (default: 0).
+   * @param {number} [index] - The index of the account to get (default: 0).
    * @returns {Promise<WalletAccountEvm>} The account.
    */
   async getAccount (index = 0) {
@@ -100,8 +96,7 @@ export default class WalletManagerEvm {
    * @returns {Promise<WalletAccountEvm>} The account.
    */
   async getAccountByPath (path) {
-    const fullPath = `${BIP_44_ETH_DERIVATION_PATH_BASE}/${path}`
-    return new WalletAccountEvm(this.#seedPhrase, fullPath, {
+    return new WalletAccountEvm(this.#seedPhrase, path, {
       rpcUrl: this.#provider?.connection?.url
     })
   }
