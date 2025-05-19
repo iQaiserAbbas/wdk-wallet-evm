@@ -11,9 +11,12 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 'use strict'
 
-import { verifyMessage, Contract } from 'ethers'
+import { HDNodeWallet, JsonRpcProvider, Contract, verifyMessage } from 'ethers'
+
+export const BIP_44_ETH_DERIVATION_PATH_BASE = "m/44'/60'"
 
 /**
  * @typedef {Object} KeyPair
@@ -32,11 +35,34 @@ import { verifyMessage, Contract } from 'ethers'
  * @property {number} [maxPriorityFeePerGas] - The price (in wei) per unit of gas this transaction will allow in addition to the [EIP-1559](https://eips.ethereum.org/EIPS/eip-1559) block's base fee to bribe miners into giving this transaction priority. This is included in the maxFeePerGas, so this will not affect the total maximum cost set with maxFeePerGas.
  */
 
+/**
+ * @typedef {Object} EvmWalletConfig
+ * @property {string} [rpcUrl] - rpc url of the provider.
+ */
+
 export default class WalletAccountEvm {
   #account
 
-  constructor (account) {
-    this.#account = account
+  /**
+   * Creates a new evm wallet account.
+   *
+   * @param {string} seedPhrase - The bip-39 mnemonic.
+   * @param {string} path - The BIP-44 derivation path suffix (e.g. "0'/0/0").
+   * @param {EvmWalletConfig} [config] - The configuration object.
+   */
+  constructor (seedPhrase, path, config = {}) {
+    if (!HDNodeWallet.isValidMnemonic(seedPhrase)) {
+      throw new Error('Seed phrase is invalid.')
+    }
+
+    const fullPath = `${BIP_44_ETH_DERIVATION_PATH_BASE}/${path}`
+    this.#account = HDNodeWallet.fromPhrase(seedPhrase).derivePath(fullPath)
+
+    const { rpcUrl } = config
+    if (rpcUrl) {
+      const provider = new JsonRpcProvider(rpcUrl)    
+      this.#account= this.#account.connect(provider)
+    }
   }
 
   /**
@@ -51,7 +77,7 @@ export default class WalletAccountEvm {
   /**
    * The derivation path of this account (see [BIP-44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)).
    *
-   * @type {number}
+   * @type {string}
    */
   get path () {
     return this.#account.path
@@ -97,7 +123,6 @@ export default class WalletAccountEvm {
    */
   async verify (message, signature) {
     const address = await verifyMessage(message, signature)
-
     return address.toLowerCase() === this.#account.address.toLowerCase()
   }
 
@@ -113,7 +138,6 @@ export default class WalletAccountEvm {
     }
 
     const { hash } = await this.#account.sendTransaction(tx)
-
     return hash
   }
 
@@ -130,7 +154,6 @@ export default class WalletAccountEvm {
 
     const gasLimit = await this.#account.provider.estimateGas(tx)
     const { maxFeePerGas } = await this.#account.provider.getFeeData()
-
     return Number(gasLimit * maxFeePerGas)
   }
 
@@ -145,7 +168,6 @@ export default class WalletAccountEvm {
     }
 
     const balance = await this.#account.provider.getBalance(await this.getAddress())
-
     return Number(balance)
   }
 
@@ -163,7 +185,6 @@ export default class WalletAccountEvm {
     const abi = ['function balanceOf(address owner) view returns (uint256)']
     const token = new Contract(tokenAddress, abi, this.#account.provider)
     const balance = await token.balanceOf(await this.getAddress())
-
     return Number(balance)
   }
 }
