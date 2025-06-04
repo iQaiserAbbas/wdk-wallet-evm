@@ -14,23 +14,19 @@
 
 'use strict'
 
-import { hmac } from '@noble/hashes/hmac'
-import { sha256 } from '@noble/hashes/sha256'
-import { sha512 } from '@noble/hashes/sha512'
-import * as secp256k1 from '@noble/secp256k1'
-
 import { assertArgument, dataLength, getBytesCopy, Signature, SigningKey, toBeHex } from 'ethers'
 
+// eslint-disable-next-line camelcase
 import { sodium_memzero } from 'sodium-universal'
 
-// secp256k1.etc.hmacSha256Sync = (k, ...m) => hmac(sha256, k, secp256k1.etc.concatBytes(...m))
+import * as secp256k1 from '@noble/secp256k1'
 
 const NULL = '0x0000000000000000000000000000000000000000000000000000000000000000'
 
 export default class MemorySafeSigningKey extends SigningKey {
   #privateKeyBuffer
 
-  constructor(privateKeyBuffer) {
+  constructor (privateKeyBuffer) {
     if (!(privateKeyBuffer instanceof Uint8Array)) {
       throw new Error('The private key must be a uint8 array.')
     }
@@ -43,27 +39,27 @@ export default class MemorySafeSigningKey extends SigningKey {
     this.#privateKeyBuffer = privateKeyBuffer
   }
 
-  get privateKey() {
+  get privateKey () {
     return NULL
   }
 
-  get publicKey() {
+  get publicKey () {
     return SigningKey.computePublicKey(this.#privateKeyBuffer)
   }
 
-  get compressedPublicKey() {
-    return SigningKey.computePublicKey(this.#privateKeyBuffer, true);
+  get compressedPublicKey () {
+    return SigningKey.computePublicKey(this.#privateKeyBuffer, true)
   }
 
-  get privateKeyBuffer() {
+  get privateKeyBuffer () {
     return this.#privateKeyBuffer
   }
 
-  get publicKeyBuffer() {
+  get publicKeyBuffer () {
     return secp256k1.getPublicKey(this.#privateKeyBuffer, false)
   }
 
-  sign(digest) {
+  sign (digest) {
     assertArgument(dataLength(digest) === 32, 'invalid digest length', 'digest', digest)
 
     const sig = secp256k1.sign(getBytesCopy(digest), this.#privateKeyBuffer, {
@@ -77,11 +73,11 @@ export default class MemorySafeSigningKey extends SigningKey {
     })
   }
 
-  computeSharedSecret(other) {
+  computeSharedSecret (other) {
     throw new Error('Method not supported.')
   }
 
-  dispose() {
+  dispose () {
     sodium_memzero(this.#privateKeyBuffer)
   }
 }

@@ -14,7 +14,7 @@
 
 'use strict'
 
-import { BrowserProvider, Contract, JsonRpcProvider, verifyMessage, Wallet } from 'ethers'
+import { BrowserProvider, Contract, JsonRpcProvider, verifyMessage } from 'ethers'
 
 import * as bip39 from 'bip39'
 
@@ -60,7 +60,7 @@ export default class WalletAccountEvm {
    */
   constructor (seed, path, config = {}) {
     if (typeof seed === 'string') {
-      if (!bip39.validateMnemonic(seedPhrase)) {
+      if (!bip39.validateMnemonic(seed)) {
         throw new Error('The seed phrase is invalid.')
       }
 

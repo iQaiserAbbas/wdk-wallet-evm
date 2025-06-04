@@ -117,7 +117,7 @@ export default class WalletManagerEvm {
       this.#accounts[path] = account
     }
 
-    return this.#accounts[path] 
+    return this.#accounts[path]
   }
 
   /**
