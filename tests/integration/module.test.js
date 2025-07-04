@@ -43,6 +43,16 @@ async function deployTestToken () {
 }
 
 describe('Integration tests', () => {
+  function createWallet () {
+    return new WalletManagerEvm(SEED_PHRASE, {
+      provider: hre.network.provider
+    })
+  }
+
+  async function reset () {
+    await hre.network.provider.send('hardhat_reset')
+  }
+
   describe('Sending Eth while checking fees', () => {
     let wallet
     let account0, account1
@@ -53,7 +63,10 @@ describe('Integration tests', () => {
     let actualFee
 
     beforeAll(async () => {
-      await hre.network.provider.send('hardhat_reset')
+      await reset()
+      wallet = createWallet()
+      account0 = await wallet.getAccountByPath("0'/0/0")
+      account1 = await wallet.getAccountByPath("0'/0/1")
     })
 
     afterAll(async () => {
@@ -62,14 +75,6 @@ describe('Integration tests', () => {
     })
 
     test('should create a wallet and derive 2 accounts using path', async () => {
-      wallet = new WalletManagerEvm(SEED_PHRASE, {
-        provider: hre.network.provider
-      })
-
-      account0 = await wallet.getAccountByPath("0'/0/0")
-
-      account1 = await wallet.getAccountByPath("0'/0/1")
-
       expect(account0.index).toBe(ACCOUNT0.index)
 
       expect(account0.path).toBe(ACCOUNT0.path)
@@ -144,40 +149,15 @@ describe('Integration tests', () => {
     let startBalance1
 
     beforeAll(async () => {
-      await hre.network.provider.send('hardhat_reset')
+      await reset()
+      wallet = createWallet()
+      account0 = await wallet.getAccountByPath("0'/0/0")
+      account1 = await wallet.getAccountByPath("0'/0/1")
     })
 
     afterAll(async () => {
       account0.dispose()
       account1.dispose()
-    })
-
-    test('should create a wallet and derive 2 accounts using path', async () => {
-      wallet = new WalletManagerEvm(SEED_PHRASE, {
-        provider: hre.network.provider
-      })
-
-      account0 = await wallet.getAccountByPath("0'/0/0")
-
-      account1 = await wallet.getAccountByPath("0'/0/1")
-
-      expect(account0.index).toBe(ACCOUNT0.index)
-
-      expect(account0.path).toBe(ACCOUNT0.path)
-
-      expect(account0.keyPair).toEqual({
-        privateKey: new Uint8Array(Buffer.from(ACCOUNT0.keyPair.privateKey, 'hex')),
-        publicKey: new Uint8Array(Buffer.from(ACCOUNT0.keyPair.publicKey, 'hex'))
-      })
-
-      expect(account1.index).toBe(ACCOUNT1.index)
-
-      expect(account1.path).toBe(ACCOUNT1.path)
-
-      expect(account1.keyPair).toEqual({
-        privateKey: new Uint8Array(Buffer.from(ACCOUNT1.keyPair.privateKey, 'hex')),
-        publicKey: new Uint8Array(Buffer.from(ACCOUNT1.keyPair.publicKey, 'hex'))
-      })
     })
 
     test('should successfully send transaction', async () => {
@@ -214,41 +194,16 @@ describe('Integration tests', () => {
     let actualFee
 
     beforeAll(async () => {
-      await hre.network.provider.send('hardhat_reset')
+      await reset()
+      wallet = createWallet()
+      account0 = await wallet.getAccountByPath("0'/0/0")
+      account1 = await wallet.getAccountByPath("0'/0/1")
       testToken = await deployTestToken()
     })
 
     afterAll(async () => {
       account0.dispose()
       account1.dispose()
-    })
-
-    test('should create a wallet and derive 2 accounts using path', async () => {
-      wallet = new WalletManagerEvm(SEED_PHRASE, {
-        provider: hre.network.provider
-      })
-
-      account0 = await wallet.getAccountByPath("0'/0/0")
-
-      account1 = await wallet.getAccountByPath("0'/0/1")
-
-      expect(account0.index).toBe(ACCOUNT0.index)
-
-      expect(account0.path).toBe(ACCOUNT0.path)
-
-      expect(account0.keyPair).toEqual({
-        privateKey: new Uint8Array(Buffer.from(ACCOUNT0.keyPair.privateKey, 'hex')),
-        publicKey: new Uint8Array(Buffer.from(ACCOUNT0.keyPair.publicKey, 'hex'))
-      })
-
-      expect(account1.index).toBe(ACCOUNT1.index)
-
-      expect(account1.path).toBe(ACCOUNT1.path)
-
-      expect(account1.keyPair).toEqual({
-        privateKey: new Uint8Array(Buffer.from(ACCOUNT1.keyPair.privateKey, 'hex')),
-        publicKey: new Uint8Array(Buffer.from(ACCOUNT1.keyPair.publicKey, 'hex'))
-      })
     })
 
     test('should quote the cost of sending test tokens to from account0 to account1 and check the fee', async () => {
@@ -315,41 +270,16 @@ describe('Integration tests', () => {
     let testToken
 
     beforeAll(async () => {
-      await hre.network.provider.send('hardhat_reset')
+      await reset()
+      wallet = createWallet()
+      account0 = await wallet.getAccountByPath("0'/0/0")
+      account1 = await wallet.getAccountByPath("0'/0/1")
       testToken = await deployTestToken()
     })
 
     afterAll(async () => {
       account0.dispose()
       account1.dispose()
-    })
-
-    test('should create a wallet and derive 2 accounts using path', async () => {
-      wallet = new WalletManagerEvm(SEED_PHRASE, {
-        provider: hre.network.provider
-      })
-
-      account0 = await wallet.getAccountByPath("0'/0/0")
-
-      account1 = await wallet.getAccountByPath("0'/0/1")
-
-      expect(account0.index).toBe(ACCOUNT0.index)
-
-      expect(account0.path).toBe(ACCOUNT0.path)
-
-      expect(account0.keyPair).toEqual({
-        privateKey: new Uint8Array(Buffer.from(ACCOUNT0.keyPair.privateKey, 'hex')),
-        publicKey: new Uint8Array(Buffer.from(ACCOUNT0.keyPair.publicKey, 'hex'))
-      })
-
-      expect(account1.index).toBe(ACCOUNT1.index)
-
-      expect(account1.path).toBe(ACCOUNT1.path)
-
-      expect(account1.keyPair).toEqual({
-        privateKey: new Uint8Array(Buffer.from(ACCOUNT1.keyPair.privateKey, 'hex')),
-        publicKey: new Uint8Array(Buffer.from(ACCOUNT1.keyPair.publicKey, 'hex'))
-      })
     })
 
     test('should successfully send transaction', async () => {
@@ -385,41 +315,16 @@ describe('Integration tests', () => {
     let testToken
 
     beforeAll(async () => {
-      await hre.network.provider.send('hardhat_reset')
+      await reset()
+      wallet = createWallet()
+      account0 = await wallet.getAccountByPath("0'/0/0")
+      account1 = await wallet.getAccountByPath("0'/0/1")
       testToken = await deployTestToken()
     })
 
     afterAll(async () => {
       account0.dispose()
       account1.dispose()
-    })
-
-    test('should create a wallet and derive 2 accounts using path', async () => {
-      wallet = new WalletManagerEvm(SEED_PHRASE, {
-        provider: hre.network.provider
-      })
-
-      account0 = await wallet.getAccountByPath("0'/0/0")
-
-      account1 = await wallet.getAccountByPath("0'/0/1")
-
-      expect(account0.index).toBe(ACCOUNT0.index)
-
-      expect(account0.path).toBe(ACCOUNT0.path)
-
-      expect(account0.keyPair).toEqual({
-        privateKey: new Uint8Array(Buffer.from(ACCOUNT0.keyPair.privateKey, 'hex')),
-        publicKey: new Uint8Array(Buffer.from(ACCOUNT0.keyPair.publicKey, 'hex'))
-      })
-
-      expect(account1.index).toBe(ACCOUNT1.index)
-
-      expect(account1.path).toBe(ACCOUNT1.path)
-
-      expect(account1.keyPair).toEqual({
-        privateKey: new Uint8Array(Buffer.from(ACCOUNT1.keyPair.privateKey, 'hex')),
-        publicKey: new Uint8Array(Buffer.from(ACCOUNT1.keyPair.publicKey, 'hex'))
-      })
     })
 
     test('should get token balance of account0', async () => {
@@ -510,23 +415,13 @@ describe('Integration tests', () => {
     let signature
 
     beforeAll(async () => {
-      await hre.network.provider.send('hardhat_reset')
+      await reset()
+      wallet = createWallet()
+      account0 = await wallet.getAccountByPath("0'/0/0")
     })
 
     afterAll(async () => {
       account0.dispose()
-    })
-
-    test('should create a wallet and derive account using path', async () => {
-      wallet = new WalletManagerEvm(SEED_PHRASE, {
-        provider: hre.network.provider
-      })
-
-      account0 = await wallet.getAccountByPath("0'/0/0")
-
-      expect(account0.index).toBe(ACCOUNT0.index)
-
-      expect(account0.path).toBe(ACCOUNT0.path)
     })
 
     test('should sign a message and verify its signature', async () => {
@@ -542,40 +437,14 @@ describe('Integration tests', () => {
 
   describe('Disposing the wallet', () => {
     let wallet
-    let account0
-    let account1
+    let account0, account1
     const message = 'Hello, world!'
 
     beforeAll(async () => {
-      await hre.network.provider.send('hardhat_reset')
-    })
-
-    test('should create a wallet and derive account using path', async () => {
-      wallet = new WalletManagerEvm(SEED_PHRASE, {
-        provider: hre.network.provider
-      })
-
+      await reset()
+      wallet = createWallet()
       account0 = await wallet.getAccountByPath("0'/0/0")
-
       account1 = await wallet.getAccountByPath("0'/0/1")
-
-      expect(account0.index).toBe(ACCOUNT0.index)
-
-      expect(account0.path).toBe(ACCOUNT0.path)
-
-      expect(account0.keyPair).toEqual({
-        privateKey: new Uint8Array(Buffer.from(ACCOUNT0.keyPair.privateKey, 'hex')),
-        publicKey: new Uint8Array(Buffer.from(ACCOUNT0.keyPair.publicKey, 'hex'))
-      })
-
-      expect(account1.index).toBe(ACCOUNT1.index)
-
-      expect(account1.path).toBe(ACCOUNT1.path)
-
-      expect(account1.keyPair).toEqual({
-        privateKey: new Uint8Array(Buffer.from(ACCOUNT1.keyPair.privateKey, 'hex')),
-        publicKey: new Uint8Array(Buffer.from(ACCOUNT1.keyPair.publicKey, 'hex'))
-      })
     })
 
     test('should dispose the wallet and throw an error when trying to access the private key', async () => {
@@ -601,48 +470,24 @@ describe('Integration tests', () => {
 
   describe('Sending a transaction with a low transfer max fee', () => {
     let wallet
-    let account0
-    let account1
+    let account0, account1
     const maxFee = 1_000_000
     let testToken
 
     beforeAll(async () => {
-      await hre.network.provider.send('hardhat_reset')
+      await reset()
+      wallet = new WalletManagerEvm(SEED_PHRASE, {
+        provider: hre.network.provider,
+        transferMaxFee: maxFee
+      })
+      account0 = await wallet.getAccountByPath("0'/0/0")
+      account1 = await wallet.getAccountByPath("0'/0/1")
       testToken = await deployTestToken()
     })
 
     afterAll(async () => {
       account0.dispose()
       account1.dispose()
-    })
-
-    test('should create a wallet and derive account using path', async () => {
-      wallet = new WalletManagerEvm(SEED_PHRASE, {
-        provider: hre.network.provider,
-        transferMaxFee: maxFee
-      })
-
-      account0 = await wallet.getAccountByPath("0'/0/0")
-
-      account1 = await wallet.getAccountByPath("0'/0/1")
-
-      expect(account0.index).toBe(ACCOUNT0.index)
-
-      expect(account0.path).toBe(ACCOUNT0.path)
-
-      expect(account0.keyPair).toEqual({
-        privateKey: new Uint8Array(Buffer.from(ACCOUNT0.keyPair.privateKey, 'hex')),
-        publicKey: new Uint8Array(Buffer.from(ACCOUNT0.keyPair.publicKey, 'hex'))
-      })
-
-      expect(account1.index).toBe(ACCOUNT1.index)
-
-      expect(account1.path).toBe(ACCOUNT1.path)
-
-      expect(account1.keyPair).toEqual({
-        privateKey: new Uint8Array(Buffer.from(ACCOUNT1.keyPair.privateKey, 'hex')),
-        publicKey: new Uint8Array(Buffer.from(ACCOUNT1.keyPair.publicKey, 'hex'))
-      })
     })
 
     test('should send a transaction with a low transfer max fee', async () => {
