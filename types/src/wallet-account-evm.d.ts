@@ -1,5 +1,5 @@
 /** @implements {IWalletAccount} */
-export default class WalletAccountEvm extends WalletAccountEvmReadOnly implements IWalletAccount {
+export default class WalletAccountEvm extends WalletAccountReadOnlyEvm implements IWalletAccount {
     /**
      * Creates a new evm wallet account.
      *
@@ -84,4 +84,4 @@ export type TransferOptions = import("@wdk/wallet").TransferOptions;
 export type TransferResult = import("@wdk/wallet").TransferResult;
 export type EvmTransaction = import("./wallet-account-read-only-evm.js").EvmTransaction;
 export type EvmWalletConfig = import("./wallet-account-read-only-evm.js").EvmWalletConfig;
-import WalletAccountEvmReadOnly from './wallet-account-read-only-evm.js';
+import WalletAccountReadOnlyEvm from './wallet-account-read-only-evm.js';

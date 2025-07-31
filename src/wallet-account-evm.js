@@ -18,7 +18,7 @@ import { verifyMessage } from 'ethers'
 
 import * as bip39 from 'bip39'
 
-import WalletAccountEvmReadOnly from './wallet-account-read-only-evm.js'
+import WalletAccountReadOnlyEvm from './wallet-account-read-only-evm.js'
 
 import MemorySafeHDNodeWallet from './memory-safe/hd-node-wallet.js'
 
@@ -39,7 +39,7 @@ import MemorySafeHDNodeWallet from './memory-safe/hd-node-wallet.js'
 const BIP_44_ETH_DERIVATION_PATH_PREFIX = "m/44'/60'"
 
 /** @implements {IWalletAccount} */
-export default class WalletAccountEvm extends WalletAccountEvmReadOnly {
+export default class WalletAccountEvm extends WalletAccountReadOnlyEvm {
   /**
    * Creates a new evm wallet account.
    *
