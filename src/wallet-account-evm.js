@@ -35,10 +35,10 @@ import MemorySafeHDNodeWallet from './memory-safe/hd-node-wallet.js'
 /** @typedef {import('./wallet-account-read-only-evm.js').EvmWalletConfig} EvmWalletConfig */
 
 /**
- * @typedef {object} ApproveOptions
- * @property {string} token The address of the token to approve.
- * @property {string} spender The spender’s address.
- * @property {number | bigint} amount The amount of tokens to approve to the spender.
+ * @typedef {Object} ApproveOptions
+ * @property {string} token - The address of the token to approve.
+ * @property {string} spender - The spender’s address.
+ * @property {number | bigint} amount - The amount of tokens to approve to the spender.
  */
 
 const BIP_44_ETH_DERIVATION_PATH_PREFIX = "m/44'/60'"
@@ -196,6 +196,10 @@ export default class WalletAccountEvm extends WalletAccountReadOnlyEvm {
    * @throws {Error} If trying to approve usdts on ethereum with allowance not equal to zero (due to the usdt allowance reset requirement).
    */
   async approve (options) {
+    if (!this._account.provider) {
+      throw new Error('The wallet must be connected to a provider to approve funds.')
+    }
+
     const { token, spender, amount } = options
     const { chainId } = await this._provider.getNetwork()
 

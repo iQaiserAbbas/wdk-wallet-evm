@@ -181,7 +181,7 @@ export default class WalletAccountReadOnlyEvm extends WalletAccountReadOnly {
     const abi = ['function allowance(address owner, address spender) view returns (uint256)']
     const contract = new Contract(token, abi, this._provider)
     const allowance = await contract.allowance(address, spender)
-    return BigInt(allowance.toString())
+    return allowance
   }
 
   /**

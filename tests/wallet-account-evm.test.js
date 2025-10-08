@@ -1,6 +1,6 @@
 import hre from 'hardhat'
 
-import { ContractFactory } from 'ethers'
+import { ContractFactory, Contract } from 'ethers'
 
 import * as bip39 from 'bip39'
 
@@ -263,8 +263,9 @@ describe('WalletAccountEvm', () => {
       const transaction = await hre.ethers.provider.getTransaction(hash)
       const data = testToken.interface.encodeFunctionData('approve', [SPENDER, AMOUNT])
 
-      expect(transaction.to).toEqual(APPROVE_OPTIONS.token)
-      expect(transaction.data).toEqual(data)
+      expect(transaction.hash).toBe(hash)
+      expect(transaction.to).toBe(APPROVE_OPTIONS.token)
+      expect(transaction.data).toBe(data)
       expect(typeof fee).toBe('bigint')
       expect(fee).toBeGreaterThan(0n)
 
@@ -285,6 +286,32 @@ describe('WalletAccountEvm', () => {
       await expect(account.approve(approveOptions))
         .rejects.toThrow('USDT requires the current allowance to be reset to 0 before setting a new non-zero value.')
     })
+    
+    test('should successfully approve a non-zero amount for USDT on mainnet when allowance is zero', async () => {
+      jest.spyOn(account, 'getAllowance').mockResolvedValue(0n)
+      jest.spyOn(account._provider, 'getNetwork').mockResolvedValue({ chainId: 1n })
+      const sendTxSpy = jest.spyOn(account, 'sendTransaction').mockResolvedValue({ hash: '0xhash', fee: 0n })
+
+      const approveOptions = {
+        token: USDT_MAINNET_ADDRESS,
+        spender: SPENDER,
+        amount: AMOUNT
+      }
+
+      const abi = ['function approve(address spender, uint256 amount) returns (bool)']
+      const contract = new Contract(USDT_MAINNET_ADDRESS, abi, hre.ethers.provider)
+      const expectedData = contract.interface.encodeFunctionData('approve', [SPENDER, AMOUNT])
+
+      const { hash, fee } = await account.approve(approveOptions)
+
+      expect(hash).toBe('0xhash')
+      expect(fee).toBe(0n)
+      expect(sendTxSpy).toHaveBeenCalledWith({
+        to: USDT_MAINNET_ADDRESS,
+        value: 0,
+        data: expectedData
+      })
+    })
 
     test('should successfully approve a zero amount for USDT on mainnet when allowance is non-zero', async () => {
       jest.spyOn(account, 'getAllowance').mockResolvedValue(1n)
@@ -297,8 +324,19 @@ describe('WalletAccountEvm', () => {
         amount: 0
       }
 
-      await account.approve(approveOptions)
-      expect(sendTxSpy).toHaveBeenCalled()
+      const abi = ['function approve(address spender, uint256 amount) returns (bool)']
+      const contract = new Contract(USDT_MAINNET_ADDRESS, abi, hre.ethers.provider)
+      const expectedData = contract.interface.encodeFunctionData('approve', [SPENDER, 0])
+
+      const { hash, fee } = await account.approve(approveOptions)
+
+      expect(hash).toBe('0xhash')
+      expect(fee).toBe(0n)
+      expect(sendTxSpy).toHaveBeenCalledWith({
+        to: USDT_MAINNET_ADDRESS,
+        value: 0,
+        data: expectedData
+      })
     })
 
     test('should throw if the account is not connected to a provider', async () => {
@@ -310,7 +348,7 @@ describe('WalletAccountEvm', () => {
       }
 
       await expect(accountWithoutProvider.approve(approveOptions))
-        .rejects.toThrow("Cannot read properties of undefined (reading 'getNetwork')")
+        .rejects.toThrow('The wallet must be connected to a provider to approve funds.')
     })
   })
 
