@@ -4,18 +4,18 @@ import WalletManagerEvm from '../../../index.js'
 
 dotenv.config()
 
-if (!process.env.SEPOLIA_TESTNET_RPC_URL || !process.env.TESTNET_SEED_PHRASE) {
+if (!process.env.SEPOLIA_TESTNET_RPC_URL) {
   throw new Error(
     '❌ Missing required environment variables.\n' +
     'Please copy `.env.example` to `.env` and set:\n' +
-    '  SEPOLIA_TESTNET_RPC_URL, TESTNET_SEED_PHRASE'
+    '  SEPOLIA_TESTNET_RPC_URL'
   )
 }
 
 
 export const SEPOLIA_TESTNET_RPC_URL = process.env.SEPOLIA_TESTNET_RPC_URL || ''
 export const LOCAL_FORK_RPC_URL = process.env.LOCAL_FORK_RPC_URL || ''
-export const TESTNET_SEED_PHRASE = process.env.TESTNET_SEED_PHRASE || ''
+export const TESTNET_SEED_PHRASE = 'cook voyage document eight skate token alien guide drink uncle term abuse'
 export const TEST_TOKEN_ADDRESS = '0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9'
 export const RECEIVER = '0xd13a8c33ecb4d38fbc1760c7f7f1e1c7b1162739'
 
